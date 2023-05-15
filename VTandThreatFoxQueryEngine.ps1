@@ -1,5 +1,5 @@
 # Write-Host 'Enter your API key for VirusTotal'
-$apikey = "0abca768de74d8a258fe22bf1602423f6581a544aa15f9e2cc2e9483bac17dd1" #Read-Host
+$apikey = "YOUR API KEY" #Read-Host
 Write-Host 'Choose your search type (1 for Hash, 2 for Domain, 3 for IP, 4 for ThreatFox IOC, 5 for ThreatFox Hash, 6 for ThreatFox Tag, 7 for ThreatFox Malware)'
 $choice = Read-Host
 Write-Host 'Please enter your input based on the choice (single value or path to CSV file)'
