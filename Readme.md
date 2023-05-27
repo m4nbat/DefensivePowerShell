@@ -11,11 +11,15 @@ This repo contains PowerShell scripts that cover the following blue team areas:
 
 ## Malware Analysis
 
-
+| Script | Purpose | Link |
+|--|--|--|
+|  |  |  |
 
 ## Digital Forensics
 
-
+| Script | Purpose | Link |
+|--|--|--|
+|  |  |  |
 
 ## Log Analysis
 
