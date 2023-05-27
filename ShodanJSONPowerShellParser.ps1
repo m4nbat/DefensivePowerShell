@@ -32,7 +32,7 @@ foreach ($inputFile in $jsonFiles) {
     }
 
     # Extract IP addresses
-    $ipAddresses = Select-String -Path $inputFile.FullName -Pattern '"ip_str":\s+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}),' -AllMatches |
+    $ipAddresses = Select-String -Path $inputFile.FullName -Pattern '"ip_str":\s+"([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})"' -AllMatches |
     ForEach-Object {
         $_.Matches | ForEach-Object {
             $_.Groups[1].Value
