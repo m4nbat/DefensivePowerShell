@@ -1,4 +1,17 @@
 # Purpose:
 
-This repo contains scripts that can interact with the VT and ThreatFox APIs
+This repo contains PowerShell scripts that cover the following blue team areas:
+
+## CTI
+
+
+## Malware Analysis
+
+
+
+# Digital Forensics
+
+
+
+# Log Analysis
 
