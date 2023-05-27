@@ -29,4 +29,4 @@ This repo contains PowerShell scripts that cover the following blue team areas:
 
 | Script | Description | Link |
 |--|--|--|
-|  |  |  |
+| SANSGet-WinEventPowerShell | This is a PowerShell version of the SANS Get-WinEvent static cheat sheet: https://wiki.sans.blue/Tools/pdfs/Get-WinEvent.pdf  | [LINK](https://github.com/m4nbat/DefensivePowerShell/blob/main/SANSGet-WinEventPowerShell.ps1) |
