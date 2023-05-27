@@ -9,9 +9,9 @@ This repo contains PowerShell scripts that cover the following blue team areas:
 
 
 
-# Digital Forensics
+## Digital Forensics
 
 
 
-# Log Analysis
+## Log Analysis
 
