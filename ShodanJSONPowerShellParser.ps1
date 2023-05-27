@@ -32,20 +32,10 @@ foreach ($inputFile in $jsonFiles) {
     }
 
     # Extract IP addresses
-    $ipAddresses = Select-String -Path $inputFile.FullName -Pattern '"ip":\s+([0-9]+),' -AllMatches |
+    $ipAddresses = Select-String -Path $inputFile.FullName -Pattern '"ip_str":\s+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}),' -AllMatches |
     ForEach-Object {
         $_.Matches | ForEach-Object {
-            if ($_.Groups.Count -gt 1) {
-                $ipInt = $_.Groups[1].Value.Trim('"')
-                if ($ipInt -as [int64]) {
-                    $ipBin = [Convert]::ToString($ipInt, 2).PadLeft(32, '0')
-                    $ipParts = $ipBin -split '(.{8})' | Where-Object { $_ }
-                    $ipAddress = [string]::Join('.', ($ipParts | ForEach-Object { [Convert]::ToInt32($_, 2) }))
-                    $ipAddress
-                } else {
-                    Write-Output "Not a valid 64-bit integer: $ipInt"
-                }
-            }
+            $_.Groups[1].Value
         }
     } | Sort-Object -Unique
 
