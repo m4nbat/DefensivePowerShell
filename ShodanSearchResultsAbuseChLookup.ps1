@@ -1,11 +1,7 @@
-# This script prompts the user for a Shodan API key and Shodan search term. 
-# It then performs the shodan search stores the results and uses the IP addresses from the results to query the abuse.ch threatfox API.
-# It then outputs these results as a csv file containing information on the IP addresses that it matched in the threatfox IOC search.
-
-
 # Reset the outputs for the next search
 $ipOutput = @()
 $noMatchList = @()
+$matchList = @()
 
 # Prompt the user for the necessary information
 $apiKey = Read-Host -Prompt "Enter your Shodan API key"
@@ -24,6 +20,9 @@ $shodanParams = @{
 # Execute the Shodan API request
 $shodanResponse = Invoke-RestMethod -Uri $shodanBaseUrl -Body $shodanParams -Method Get
 
+# Sleep to prevent rate limiting
+Start-Sleep -Seconds 5
+
 # Define Abuse.ch API URL
 $abuseApiUrl = 'https://threatfox-api.abuse.ch/api/v1/'
 
@@ -37,30 +36,38 @@ foreach ($match in $shodanResponse.matches) {
         'search_term' = $match.ip_str
     }) -ContentType 'application/json'
 
+    # Sleep to prevent rate limiting
+    Start-Sleep -Seconds 5 
+
     # Initialize a variable to track whether any data was found for the current IP
     $dataFound = $false
 
     # Process the Abuse.ch API response and save the data to the output
-if ($abuseResponse.data) {
-    foreach ($record in $abuseResponse.data) {
-        # Check if the ioc field is not null
-        if ($record.ioc -ne $null) {
-            # Save IP addresses output to a CSV file
-            $ipOutput += [PSCustomObject]@{
-                'ioc' = $record.ioc
-                'threat_type' = $record.threat_type
-                'malware' = $record.malware
-                'confidence_level' = $record.confidence_level
-                'reporter' = $record.reporter
-                'tags' = $record.tags -join ', '  # Handle 'tags' as JSON array
-                'first_seen' = $record.first_seen
-            }
+    if ($abuseResponse.data) {
+        foreach ($record in $abuseResponse.data) {
+            # Check if the ioc field is not null
+            if ($record.ioc -ne $null) {
+                # Save IP addresses output to a CSV file
+                $ipOutput += [PSCustomObject]@{
+                    'ioc' = $record.ioc
+                    'threat_type' = $record.threat_type
+                    'malware' = $record.malware
+                    'confidence_level' = $record.confidence_level
+                    'reporter' = $record.reporter
+                    'tags' = $record.tags -join ', '  # Handle 'tags' as JSON array
+                    'first_seen' = $record.first_seen
+                }
 
-            # Since we found some data, set the tracking variable to true
-            $dataFound = $true
+                # Since we found some data, set the tracking variable to true
+                $dataFound = $true
+
+                # Add to match list
+                if ($matchList -notcontains $record.ioc) {
+                    $matchList += $record.ioc
+                }
+            }
         }
     }
-}
 
     # If no data was found for the current IP, add it to the no-match list
     if (-not $dataFound) {
@@ -79,11 +86,8 @@ if ($abuseResponse.data) {
     }
 }
 
-
-# Rest of your script...
-
 # Save IP addresses output to a CSV file
-$ipOutput | Export-Csv -Path ("$directoryPath\IPAddresses.csv") -NoTypeInformation
+$ipOutput | Export-Csv -Path ("C:\Users\%username%\downloads\IPAddresses.csv") -NoTypeInformation
 
 # Prepare the summary statistics
 $threatTypeCount = @{}
@@ -108,9 +112,8 @@ foreach ($output in $ipOutput) {
     }
 }
 
-
 Write-Output "`nResults Summary:"
-Write-Output "Total Results: $totalResults"
+Write-Output "Total Results idnetified in Abuse.CH ThreatFox: $($ipOutput.Count)"
 
 Write-Output "`nThreat Types Breakdown:"
 foreach ($key in $threatTypeCount.Keys) {
@@ -125,4 +128,34 @@ foreach ($key in $malwareTypeCount.Keys) {
 Write-Output "`nNo Match List:"
 foreach ($ioc in $noMatchList) {
     Write-Output $ioc
+}
+
+Print out the IPs that matched a result from abuse.ch
+Write-Output "`nMatch List:"
+foreach ($ioc in $matchList) {
+    Write-Output $ioc
+}
+
+$ipList = @()
+$urlList = @()
+
+foreach ($ioc in $matchList) {
+    if ($ioc.StartsWith("http")) {
+        # This is a URL
+        $urlList += $ioc
+    } else {
+        # This is an IP
+        $ipList += $ioc
+    }
+}
+
+# Now you can print out URLs and IPs separately
+Write-Output "`nURL List:"
+foreach ($url in $urlList) {
+    Write-Output $url
+}
+
+Write-Output "`nIP List:"
+foreach ($ip in $ipList) {
+    Write-Output $ip
 }
